@@ -12,6 +12,16 @@
 
 import UIKit
 
+#if swift(>=4.2)
+    public typealias FSControlContentHorizontalAlignment = UIControl.ContentHorizontalAlignment
+    public typealias FSControlState = UIControl.State
+    public typealias FSCollectionViewScrollPosition = UICollectionView.ScrollPosition
+#else
+    public typealias FSControlContentHorizontalAlignment = UIControlContentHorizontalAlignment
+    public typealias FSControlState = UIControlState
+    public typealias FSCollectionViewScrollPosition = UICollectionViewScrollPosition
+#endif
+
 @objc
 public protocol FSPagerViewDataSource: NSObjectProtocol {
     
@@ -485,7 +495,7 @@ open class FSPagerView: UIView,UICollectionViewDataSource,UICollectionViewDelega
     @objc(selectItemAtIndex:animated:)
     open func selectItem(at index: Int, animated: Bool) {
         let indexPath = self.nearbyIndexPath(for: index)
-        let scrollPosition: UICollectionView.ScrollPosition = self.scrollDirection == .horizontal ? .centeredHorizontally : .centeredVertically
+        let scrollPosition: FSCollectionViewScrollPosition = self.scrollDirection == .horizontal ? .centeredHorizontally : .centeredVertically
         self.collectionView.selectItem(at: indexPath, animated: animated, scrollPosition: scrollPosition)
     }
     
@@ -572,7 +582,11 @@ open class FSPagerView: UIView,UICollectionViewDataSource,UICollectionViewDelega
             return
         }
         self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.automaticSlidingInterval), target: self, selector: #selector(self.flipNext(sender:)), userInfo: nil, repeats: true)
-        RunLoop.current.add(self.timer!, forMode: .common)
+        #if swift(>=4.2)
+            RunLoop.current.add(self.timer!, forMode: .common)
+        #else
+            RunLoop.current.add(self.timer!, forMode: .commonModes)
+        #endif
     }
     
     @objc
